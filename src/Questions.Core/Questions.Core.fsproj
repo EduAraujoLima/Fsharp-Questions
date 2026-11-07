@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Avisos úteis para manter o código funcional e limpo -->
+    <OtherFlags>$(OtherFlags) --warnon:1182 --warnon:3390</OtherFlags>
+    <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- A ordem dos arquivos importa em F#: cada arquivo só enxerga os anteriores. -->
+    <Compile Include="Prelude.fs" />
+    <Compile Include="Rng.fs" />
+    <Compile Include="Access.fs" />
+    <Compile Include="Errors.fs" />
+    <Compile Include="Domain.fs" />
+    <Compile Include="Contracts.fs" />
+    <Compile Include="QuestionRules.fs" />
+    <Compile Include="Authorization.fs" />
+    <Compile Include="QuestionCatalog.fs" />
+    <Compile Include="ExamGeneration.fs" />
+    <Compile Include="Grading.fs" />
+    <Compile Include="Views.fs" />
+    <Compile Include="Workflows.fs" />
+  </ItemGroup>
+
+</Project>
