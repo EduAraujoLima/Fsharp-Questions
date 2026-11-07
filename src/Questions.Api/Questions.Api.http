@@ -1,0 +1,104 @@
+### Arquivo de requisições de exemplo (VS Code REST Client / Visual Studio / Rider)
+@host = http://localhost:5203
+
+### 1. Login como administrador
+# @name admin
+POST {{host}}/api/auth/token
+Content-Type: application/json
+
+{ "username": "admin", "password": "admin123" }
+
+### 2. Login como aluno
+# @name student
+POST {{host}}/api/auth/token
+Content-Type: application/json
+
+{ "username": "aluno", "password": "aluno123" }
+
+### Tipos de questão e suas regras (público)
+GET {{host}}/api/question-types
+
+### Listar questões (Admin) — filtros opcionais: type, difficulty, search, page, pageSize
+GET {{host}}/api/questions?type=SingleChoice&page=1&pageSize=10
+Authorization: Bearer {{admin.response.body.accessToken}}
+
+### Cadastrar questão de escolha única (Admin)
+# @name created
+POST {{host}}/api/questions
+Authorization: Bearer {{admin.response.body.accessToken}}
+Content-Type: application/json
+
+{
+  "type": "SingleChoice",
+  "statement": "Qual função da FSharp.Core aplica uma função a cada item de uma lista?",
+  "difficulty": "Easy",
+  "options": [
+    { "text": "List.map", "isCorrect": true },
+    { "text": "List.iter", "isCorrect": false },
+    { "text": "List.length", "isCorrect": false }
+  ]
+}
+
+### Consultar questão (Admin)
+GET {{host}}/api/questions/{{created.response.body.id}}
+Authorization: Bearer {{admin.response.body.accessToken}}
+
+### Alterar questão (Admin) — gera nova versão
+PUT {{host}}/api/questions/{{created.response.body.id}}
+Authorization: Bearer {{admin.response.body.accessToken}}
+Content-Type: application/json
+
+{
+  "type": "MultipleChoice",
+  "statement": "Quais funções da FSharp.Core transformam uma lista em outra lista?",
+  "difficulty": "Medium",
+  "options": [
+    { "text": "List.map", "isCorrect": true },
+    { "text": "List.filter", "isCorrect": true },
+    { "text": "List.length", "isCorrect": false }
+  ]
+}
+
+### Excluir questão (Admin)
+DELETE {{host}}/api/questions/{{created.response.body.id}}
+Authorization: Bearer {{admin.response.body.accessToken}}
+
+### Gerar prova aleatória (aluno: sem gabarito)
+# @name exam
+POST {{host}}/api/exams
+Authorization: Bearer {{student.response.body.accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Prova de Programação Funcional",
+  "sections": [
+    { "type": "SingleChoice", "count": 2 },
+    { "type": "TrueFalse", "count": 1 },
+    { "count": 2 }
+  ],
+  "shuffleOptions": true
+}
+
+### Gerar prova com gabarito e semente fixa (Admin)
+POST {{host}}/api/exams
+Authorization: Bearer {{admin.response.body.accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Prova reproduzível",
+  "sections": [ { "difficulty": "Easy", "count": 3 } ],
+  "includeAnswerKey": true,
+  "seed": 42
+}
+
+### Corrigir respostas
+POST {{host}}/api/exams/grade
+Authorization: Bearer {{student.response.body.accessToken}}
+Content-Type: application/json
+
+{
+  "answers": [
+    { "questionId": "{{exam.response.body.questions[0].questionId}}", "selectedOptionIds": [1] },
+    { "questionId": "{{exam.response.body.questions[1].questionId}}", "selectedOptionIds": [2] }
+  ]
+}
